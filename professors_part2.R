@@ -345,11 +345,15 @@ all_data %<>% mutate(nganh = nganh_rename(nganh))
 all_data$nganh %>% unique() -> k
 k <- k[order(k)]
 
+k
+
 nganh_rename_lan2 <- function(x) {
   ELSE <- TRUE
   case_when(x == k[6] ~ k[5], 
             x == k[8] ~ k[7], 
+            x == k[17] ~ k[16],
             x == k[20] ~ k[19], 
+            
             x == k[22] ~ k[21], 
             x == k[26] ~ k[25], 
             x == k[40] ~ k[39], 
@@ -368,11 +372,12 @@ all_data %>%
   arrange(-n) -> u
 
 
+
 u %>% 
   slice(1:25) %>% 
   ggplot(aes(reorder(nganh, n), n)) + 
   geom_col(fill = "#104E8B") + 
-  geom_col(data = u %>% filter(nganh %in% c(k[18], k[17])), fill = c("#CD2626")) + 
+  geom_col(data = u %>% filter(nganh %in% c(k[19], k[21])), fill = c("#CD2626")) + 
   coord_flip() + 
   theme_fivethirtyeight() + 
   geom_text(aes(label = n), color = "white", hjust = 1.2) + 
@@ -558,6 +563,6 @@ giao_su %>%
   theme_fivethirtyeight() + 
   geom_text(aes(label = n), color = "white", hjust = 1.2) + 
   labs(x = NULL, y = NULL, 
-       title = "The Number of of Associate Professors and Professors", 
+       title = "The Number of of Associate Professors and Professors by Birth Place for top 30", 
        caption = "Data Source: http://www.hdcdgsnn.gov.vn")
 
