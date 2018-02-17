@@ -1,4 +1,5 @@
 
+
 #==================================
 #     A Project for Funny
 #     Data Used: http://www.mediafire.com/file/rwma97dtnbdars3/giao_su.rar
@@ -16,6 +17,8 @@ path
 library(readxl)
 library(tidyverse)
 library(magrittr)
+
+# Hàm đọc và xử lí thô dữ liệu cho năm 2011: 
 
 import_gs <- function(path_to_file, sheet) {
   u <- read_excel(path_to_file, sheet = sheet) %>% 
@@ -63,12 +66,9 @@ pgs2011 <- import_gs(path[3], 2) %>%
 #  Hợp nhất các dữ liệu: 
 all_df2011 <- bind_rows(gs2011, pgs2011)
 
-
 # Tạo ra cột biến về năm được thụ phong: 
 
 all_df2011 %<>% mutate(nam = 2011)
-
-
 
 #-------------------------------------------------
 #    Dữ liệu năm 2012  (bạn này cá biệt) 
@@ -79,11 +79,8 @@ gs2012 <- read_excel(path[1], sheet = 1) %>%
   slice(-c(1:8))
 
 ten2 <- c("tt", "ho", "ten", "ngay_sinh", "gioi_tinh", "nganh")
-
 names(gs2012) <- ten2
-
 gs2012 %<>% mutate(title = "GS")
-
 pgs2012 <- read_excel(path[1], sheet = 2) %>% 
   slice(-c(1:8))
 
@@ -91,7 +88,6 @@ names(pgs2012) <- ten2
 pgs2012 %<>% mutate(title = "PGS")
 
 all_df2012 <- bind_rows(gs2012, pgs2012)
-
 all_df2012 %<>% mutate(nam = 2012, que_quan = NA, organization1 = NA)
 
 #---------------------
@@ -105,14 +101,13 @@ ten3 <- c("tt", "ho",  "ten", "ngay_sinh", "gioi_tinh", "nganh",
           "organization1", "que_quan", "x8", "x9")
 
 names(gs2013) <- ten3
-
 gs2013 %<>% select(-x8, -x9) %>% mutate(title = "GS")
-
 
 pgs2013 <- read_excel(path[4], sheet = 2) %>% 
   slice(-c(1:5))
 
 names(pgs2013) <- ten3
+
 pgs2013 %<>% select(-x8, -x9) %>% mutate(title = "PGS")
 
 all_df2013 <- bind_rows(gs2013, pgs2013)
@@ -134,7 +129,6 @@ names(gs2014) <- c("tt", "ho", "ten", "ngay_sinh", "gioi_tinh", "nganh",
 
 gs2014 %<>% mutate(title = "GS")
 
-
 pgs2014 <- read_excel(path[2], sheet = 2) %>% 
   slice(-c(1:5))
 
@@ -145,7 +139,6 @@ names(pgs2014) <- c("tt", "ho", "ten", "ngay_sinh", "gioi_tinh", "nganh",
 pgs2014 %<>% mutate(title = "PGS")
 
 all_df2014 <- bind_rows(gs2014, pgs2014)
-
 all_df2014 %<>% mutate(que_quan = province(que_quan), 
                        nam = 2014)
 
@@ -159,7 +152,6 @@ ten <- c("tt",  "ho_ten", "ngay_sinh", "gioi_tinh", "nganh",
          "organization1", "que_quan", "X")
 
 names(gs2015) <- ten
-
 pgs2015 <- read_excel(path[6], sheet = 2)
 names(pgs2015) <- ten
 
@@ -170,13 +162,10 @@ all_df2015 <- bind_rows(gs2015 %>%
                           select(-X) %>% 
                           mutate(title = "PGS"))
 
-
-
 all_df2015 %<>% mutate(que_quan = province(que_quan), 
-                       nam = 2015)
-
-all_df2015 %<>% mutate(ho = NA, ten = NA)
-
+                       nam = 2015, 
+                       ho = NA, 
+                       ten = NA)
 #------------------
 #     Năm 2016
 #------------------
@@ -198,20 +187,20 @@ gs2016 %<>% rename(tt = X__0,
                    que_quan = X__7) %>% select(-X__8, - X__9)
 
 
-  
+
 pgs2016 <- read_excel(path[5], sheet = 2) %>% 
   slice(-c(1:9))
 
 names(pgs2016) <- ten
 
 pgs2016 %<>% rename(tt = X__0, 
-                   ho = X__1, 
-                   ten = X__2, 
-                   ngay_sinh = X__3, 
-                   gioi_tinh = X__4, 
-                   nganh = X__5, 
-                   organization1 = X__6, 
-                   que_quan = X__7) %>% select(-X__8, - X__9)
+                    ho = X__1, 
+                    ten = X__2, 
+                    ngay_sinh = X__3, 
+                    gioi_tinh = X__4, 
+                    nganh = X__5, 
+                    organization1 = X__6, 
+                    que_quan = X__7) %>% select(-X__8, - X__9)
 
 
 all_df2016 <- bind_rows(gs2016 %>% mutate(title = "GS"), 
@@ -280,7 +269,6 @@ all_data <- rbind(all_df2011 %>% select(gioi_tinh, nganh, title, que_quan, organ
 library(ggthemes)
 library(hrbrthemes)
 
-
 # Có thể thấy năm 2017 số lượng tăng vọt:  
 all_data %>% 
   group_by(nam) %>% 
@@ -290,7 +278,7 @@ all_data %>%
   ggplot(aes(nam, n)) + 
   geom_col(fill = c("#104E8B")) + 
   theme_fivethirtyeight() + 
-  geom_text(aes(label = n), color = "white", vjust = 1.3) + 
+  geom_text(aes(label = n), color = "white", vjust = 1.3, size = 5) + 
   labs(x = NULL, y = NULL, 
        title = "The Number of of Associate Professors and Professors", 
        caption = "Data Source: http://www.hdcdgsnn.gov.vn")
@@ -326,8 +314,8 @@ all_data %>%
   scale_fill_wsj() + 
   theme(legend.position = "top") + 
   theme(legend.title = element_blank()) + 
-  coord_flip() + 
   scale_y_percent()
+
 
 
 # Viết hàm xử lí thông tin về ngành: 
@@ -345,15 +333,12 @@ all_data %<>% mutate(nganh = nganh_rename(nganh))
 all_data$nganh %>% unique() -> k
 k <- k[order(k)]
 
-k
-
 nganh_rename_lan2 <- function(x) {
   ELSE <- TRUE
   case_when(x == k[6] ~ k[5], 
             x == k[8] ~ k[7], 
             x == k[17] ~ k[16],
             x == k[20] ~ k[19], 
-            
             x == k[22] ~ k[21], 
             x == k[26] ~ k[25], 
             x == k[40] ~ k[39], 
@@ -382,7 +367,7 @@ u %>%
   theme_fivethirtyeight() + 
   geom_text(aes(label = n), color = "white", hjust = 1.2) + 
   labs(x = NULL, y = NULL, 
-       title = "25 Fields with the Largest Number of Associate Professors and Professors", 
+       title = "25 Fields with the Largest Number of\nAssociate Professors and Professors", 
        caption = "Data Source: http://www.hdcdgsnn.gov.vn")
 
 # 20 ngành còn lại có số GS/PGS  thấp nhất: 
@@ -394,25 +379,10 @@ u %>%
   theme_fivethirtyeight() + 
   geom_text(aes(label = n), color = "white", hjust = 1.2) + 
   labs(x = NULL, y = NULL, 
-       title = "20 Fields with the Smallest Number of Associate Professors and Professors", 
+       title = "20 Fields with the Smallest Number of\nAssociate Professors and Professors", 
        caption = "Data Source: http://www.hdcdgsnn.gov.vn")
 
 
-# Hàm tách  ra dữ  liệu về nơi sinh của các GS + PGS: 
-
-province <- function(x) {
-  x %>% 
-    str_replace_all(".*,", "") %>% 
-    str_replace_all("Tỉnh", "") %>% 
-    str_replace_all("tỉnh", "") %>% 
-    str_replace_all("-", " ") %>% 
-    str_replace_all("Thành phố", "") %>% 
-    str_replace_all("  ", " ") %>% 
-    str_replace_all("Tp. ", "") %>% 
-    str_replace_all("\r\n", " ") %>% 
-    str_trim() %>% 
-    return()
-}
 
 # Sử dụng hàm: 
 all_data %<>% 
@@ -533,12 +503,10 @@ dplyr::setdiff(vietnam_df_province$id %>% unique(),
 df1 <- data.frame(id = khong_co_gs, n = c(rep(0, 5)))
 # Sô lượng các PGS/GS theo nơi sinh (thứ tự giảm dần): 
 giao_su %>% knitr::kable()
-
 giao_su <- bind_rows(giao_su, df1)
-
 giao_su_prov <- inner_join(giao_su, vietnam_df_province, by = "id")
 
-giao_su_prov %>% head()
+
 
 library(viridis)
 
@@ -552,17 +520,113 @@ giao_su_prov %>%
         panel.grid = element_blank()) + 
   labs(title = "Associate Professors and Professors\nDensity by Birth Place", 
        caption = "Data Source: http://www.hdcdgsnn.gov.vn")
-  
- 
-# 30 tỉnh  thành sinh ra nhiều GS/PGS  nhất: 
+
+
+
+# 20 tỉnh  thành sinh ra nhiều GS/PGS  nhất. Điều đáng ngạc 
+# nhiên  là SG - khu vực địa lí đông  dân nhất nước và cũng 
+# là một trung tâm giáo dục của  cả nước lại có vị trí thấp: 
 giao_su %>% 
-  slice(1:30) %>% 
+  slice(1:20) %>% 
   ggplot(aes(reorder(id, n), n)) + 
   geom_col(fill = c("#104E8B")) + 
   coord_flip() + 
   theme_fivethirtyeight() + 
   geom_text(aes(label = n), color = "white", hjust = 1.2) + 
   labs(x = NULL, y = NULL, 
-       title = "The Number of of Associate Professors and Professors by Birth Place for top 30", 
+       title = "The Number of of Associate Professors and Professors\nby Birth Place for top 20 Provinces", 
        caption = "Data Source: http://www.hdcdgsnn.gov.vn")
 
+# Nhóm 20 tỉnh thuộc nhóm giữa: 
+giao_su %>% 
+  slice(21:40) %>% 
+  ggplot(aes(reorder(id, n), n)) + 
+  geom_col(fill = c("#104E8B")) + 
+  coord_flip() + 
+  theme_fivethirtyeight() + 
+  geom_text(aes(label = n), color = "white", hjust = 1.2) + 
+  labs(x = NULL, y = NULL)
+
+# Nhóm 23 tỉnh thuộc nhóm cuối: 
+giao_su %>% 
+  slice(41:63) %>% 
+  ggplot(aes(reorder(id, n), n)) + 
+  geom_col(fill = c("#104E8B")) + 
+  coord_flip() + 
+  theme_fivethirtyeight() + 
+  geom_text(aes(label = n), color = "white", hjust = 1.2) + 
+  labs(x = NULL, y = NULL) + 
+  scale_y_continuous(breaks = seq(1, 10, by = 1))
+
+
+
+# Tỉ lệ  chung có vẻ là cứ 3 Nam thì có một đồng nghiệp nữ. 
+# Và tỉ lệ GS/PGS là nữ có xu hướng tăng theo thời gian: 
+all_data %>% 
+  group_by(nam, gioi_tinh) %>% 
+  count() %>% 
+  ungroup() %>% 
+  mutate(nam = as.factor(nam)) %>% 
+  ggplot(aes(nam, n, fill = gioi_tinh)) + 
+  geom_col(position = "fill") + 
+  labs(x = NULL, y = NULL, 
+       title = "The Percentage between Associate Professors\nand Professors by Gender", 
+       caption = "Data Source: http://www.hdcdgsnn.gov.vn") + 
+  theme_fivethirtyeight() + 
+  scale_fill_wsj() + 
+  theme(legend.position = "top") + 
+  theme(legend.title = element_blank()) + 
+  scale_y_percent()
+
+# Phân bố GS/PGS theo giới tính ứng với  các ngành: 
+u <- all_data %>% 
+  group_by(nganh, gioi_tinh) %>% 
+  count() %>% 
+  ungroup()
+
+u %>% 
+  spread(gioi_tinh, n) -> u_wide
+
+names(u_wide) <- c("field", "Female", "Male")
+
+convert_na <- function(x) {
+  x[is.na(x)] <- 0
+  return(x)
+}
+
+u_wide %<>% mutate_at(.vars = c("Female", "Male"), 
+                      .funs = convert_na)
+
+u_wide %<>% mutate(total = Male + Female, 
+                   m_rate = Male / total, 
+                   f_rate = Female / total, 
+                   label = paste0(100*round(m_rate, 4), "%"))
+
+u_wide %<>% 
+  ungroup() %>% 
+  arrange(-m_rate) %>% 
+  mutate(field = factor(field, levels = field))
+
+
+u_wide %>% 
+  ggplot() + 
+  geom_segment(aes(x = 0, 
+                   xend = m_rate, 
+                   y = field, 
+                   yend = field, 
+                   color = "m_rate"), size = 5) + 
+  geom_segment(aes(x = m_rate, 
+                   xend = m_rate + f_rate, 
+                   y = field, 
+                   yend = field, 
+                   color = "f_rate"), size = 5) + 
+  geom_text(aes(x = 0, y = field, label = label), 
+            color = "white", hjust = -0.2) + 
+  theme_minimal() + 
+  theme(legend.position = "top") + 
+  labs(x = NULL, y = NULL, 
+       title = "Distribution of Associate Professors by Field and Gender", 
+       caption = "Data Source: http://www.hdcdgsnn.gov.vn") + 
+  scale_color_manual(values = c('#e41a1c','#4daf4a'), 
+                     name = "", 
+                     labels = c("Female", "Male"))
