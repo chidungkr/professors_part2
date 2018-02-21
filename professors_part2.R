@@ -1,9 +1,9 @@
 
 
-#==================================
+#=========================================================================
 #     A Project for Funny
 #     Data Used: http://www.mediafire.com/file/rwma97dtnbdars3/giao_su.rar
-#==================================
+#=========================================================================
 
 # Thiết lập đường dẫn cho các file dữ liệu cần phân tích: 
 rm(list = ls())
@@ -280,7 +280,7 @@ all_data %>%
   theme_fivethirtyeight() + 
   geom_text(aes(label = n), color = "white", vjust = 1.3, size = 5) + 
   labs(x = NULL, y = NULL, 
-       title = "The Number of of Associate Professors and Professors", 
+       title = "The Number of of Associate Professors and Professors from 2011 to 2017", 
        caption = "Data Source: http://www.hdcdgsnn.gov.vn")
 
 
@@ -471,6 +471,7 @@ rename_province <- function(x) {
             x == m[67] ~ v[54],
             x == m[68] ~ v[54], 
             x == m[69] ~ v[55],
+            x == m[70] ~ v[55], 
             x == m[71] ~ v[56],
             x == m[72] ~ v[57],
             x == m[73] ~ v[57],
@@ -578,7 +579,7 @@ all_data %>%
   theme(legend.title = element_blank()) + 
   scale_y_percent()
 
-# Phân bố GS/PGS theo giới tính ứng với  các ngành: 
+# Phân bố GS/PGS theo giới tính ứng với các ngành: 
 u <- all_data %>% 
   group_by(nganh, gioi_tinh) %>% 
   count() %>% 
@@ -625,8 +626,67 @@ u_wide %>%
   theme_minimal() + 
   theme(legend.position = "top") + 
   labs(x = NULL, y = NULL, 
-       title = "Distribution of Associate Professors by Field and Gender", 
+       title = "The ratio is promoted from Associate Professor to Professor", 
        caption = "Data Source: http://www.hdcdgsnn.gov.vn") + 
   scale_color_manual(values = c('#e41a1c','#4daf4a'), 
                      name = "", 
                      labels = c("Female", "Male"))
+
+
+# Hà Tĩnh, Quảng Bình và Sài Gòn là ba  tỉnh  có tỉ lệ 
+# được phong GS từ PGS cao nhất: 
+all_data %>% 
+  filter(que_quan %in% giao_su$id[1:25]) %>% 
+  group_by(title, que_quan) %>% 
+  count() %>% 
+  ungroup() -> giao_su_top25
+
+giao_su_top25 %>% 
+  spread(title, n) -> u_wide
+
+u_wide %<>% mutate(total = GS + PGS, 
+                   m_rate = GS / total, 
+                   f_rate = PGS / total, 
+                   label = paste0(100*round(m_rate, 4), "%"))
+
+u_wide %<>% 
+  ungroup() %>% 
+  arrange(m_rate) %>% 
+  mutate(que_quan = paste(que_quan, label, sep = ": ")) %>% 
+  mutate(que_quan = str_replace_all(que_quan, "city|-", "")) %>% 
+  mutate(que_quan = factor(que_quan, levels = que_quan))
+
+
+u_wide %>% 
+  ggplot() + 
+  geom_segment(aes(x = 0, 
+                   xend = m_rate, 
+                   y = que_quan, 
+                   yend = que_quan, 
+                   color = "m_rate"), size = 5) + 
+  geom_segment(aes(x = m_rate, 
+                   xend = m_rate + f_rate, 
+                   y = que_quan, 
+                   yend = que_quan, 
+                   color = "f_rate"), size = 5) + 
+  theme_minimal() + 
+  theme(legend.position = "top") + 
+  labs(x = NULL, y = NULL, 
+       title = "Distribution of Associate Professors by Field and Gender", 
+       caption = "Data Source: http://www.hdcdgsnn.gov.vn") + 
+  scale_color_manual(values = c('#e41a1c','#4daf4a'), 
+                     name = "", 
+                     labels = c("Associate Professor", "Professor"))
+
+# Hệ số hồi quy của PGS là 0.084 (biến phụ thuộc là GS): 
+
+all_data %>% 
+  filter() %>% 
+  group_by(que_quan, title) %>% 
+  count() %>% 
+  spread(title, n) %>% 
+  ungroup() -> gs_pgs
+
+gs_pgs %>% 
+  lm(GS ~ PGS, data = .) %>% 
+  summary()
